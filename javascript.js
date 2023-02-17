@@ -42,17 +42,16 @@ function Player(name,marker) {
   }
 }
 
-const player1 = Player("Max", "X");
-const player2 = Player("Meg", 'O');
-
-
 
 function GameController() {
 
   const board = Gameboard();
+  const players = []
+  players.push(Player('Max',"X"))
+  players.push(Player('Meg',"O"))
 
   let gameOver = false;
-  let activePlayer = player1;
+  let activePlayer = Math.floor(Math.random()*2);
 
 
   const checkWinner = () => {
@@ -99,15 +98,15 @@ function GameController() {
   }
 
   const changeTurns = () => {
-    if (activePlayer == player1) {
-      activePlayer = player2;
+    if (activePlayer == 0) {
+      activePlayer = 1;
     } else {
-      activePlayer = player1;
+      activePlayer = 0;
     }
 
   }
   const getGameOver = () => gameOver;
-  const getActivePlayer = () => activePlayer
+  const getActivePlayer = () => players[activePlayer]
 
   return {
     checkWinner,
@@ -183,6 +182,7 @@ const displayController  = (() => {
     if (e.keyCode == 78) {
       game = GameController()
       updateLabel(gameLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`)
+      updateLabel(winLabelDiv, "")
       refreshBoard()
       return game
     } else {
