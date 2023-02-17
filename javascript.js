@@ -50,8 +50,6 @@ const player2 = Player("Meg", 'O');
 function GameController() {
 
   const board = Gameboard();
-  const player1 = Player("Max", "X");
-  const player2 = Player("Meg", 'O');
 
   let gameOver = false;
   let activePlayer = player1;
@@ -125,10 +123,11 @@ function GameController() {
 const displayController  = (() => {
   const boardDiv = document.querySelector(".board")
   const gameLabelDiv = document.querySelector(".game-label")
+  const winLabelDiv = document.querySelector(".win-label")
 
 
-  const updateLabel = (message) => {
-    gameLabelDiv.textContent = message
+  const updateLabel = (label,message) => {
+    label.textContent = message
   }
 
   const clearBoard = () => {
@@ -141,19 +140,22 @@ const displayController  = (() => {
     currentBoard =game.board.getBoard()
     for (let i = 0; i<3; i++){
       for (let j = 0; j < 3; j++) {
-        let cell = document.createElement('button')
-        cell.dataset.column = `${j}`
-        cell.dataset.row = `${i}`
-        cell.classList.add('cell')
-        cell.textContent = currentBoard[i][j].getValue()
-        cell.addEventListener('click', takeInput)
-        boardDiv.appendChild(cell)
+        createCell(i,j)
       }
     }
   }
 
+  const createCell = (row,column) => {
+    const cell = document.createElement('button')
+      cell.dataset.column = `${column}`
+      cell.dataset.row = `${row}`
+      cell.classList.add('cell')
+      cell.textContent = currentBoard[row][column].getValue()
+      cell.addEventListener('click', takeInput)
+      boardDiv.appendChild(cell)
+  }
+
   const takeInput = (e) => {
-    console.log(e.target)
     if (e.target.textContent != "" || game.getGameOver())  {
       return
     } else {
@@ -164,12 +166,14 @@ const displayController  = (() => {
       currentBoard[i][j].setValue(activePlayer.getMarker())
       refreshBoard()
       if (game.checkWinner()) {
-        updateLabel(`${activePlayer.getName()} Won!`)
+        updateLabel(winLabelDiv,`${activePlayer.getName()} Won!`)
+        updateLabel(gameLabelDiv,`Press N to play a New Game`)
       } else if (game.checkTie()) {
-        updateLabel("It's a Tie!")
+        updateLabel(winLabelDiv,"It's a Tie!")
+        updateLabel(gameLabelDiv,`Press N to play a New Game`)
       } else{
         game.changeTurns()
-        updateLabel(`It's ${game.getActivePlayer().getName()}'s Turn`);
+        updateLabel(gameLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`);
       }
       
     }
@@ -178,7 +182,7 @@ const displayController  = (() => {
   document.addEventListener('keydown', (e) => {
     if (e.keyCode == 78) {
       game = GameController()
-      updateLabel(`It's ${game.getActivePlayer().getName()}'s Turn`)
+      updateLabel(gameLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`)
       refreshBoard()
       return game
     } else {

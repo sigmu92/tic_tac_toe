@@ -27,6 +27,13 @@ body {
   font-size: 3rem;
 }
 
+.win-label{
+  height: 20%;
+  width: 100%;
+  text-align: center;
+  font-size: 3rem;
+}
+
 .board {
   height:400px;
   width:400px;
