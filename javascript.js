@@ -62,19 +62,24 @@ function GameController() {
     //Check rows for a winning condition
     for (let i = 0; i<3; i++) {
       if (currentBoard[i][0].getValue() == currentBoard[i][1].getValue() && currentBoard[i][1].getValue() == currentBoard[i][2].getValue() && currentBoard[i][0].getValue() != "") {
+        gameOver = true;
         return true;
+        
       }
     }
     //Check columns for a winning condition
     for (let i = 0; i<3; i++){
       if (currentBoard[0][i].getValue() == currentBoard[1][i].getValue() && currentBoard[1][i].getValue() == currentBoard[2][i].getValue() && currentBoard[0][i].getValue() != "") {
+        gameOver = true;
         return true;
       }
     }
     //Check diagonals for a winning condition
     if (currentBoard[0][0].getValue() == currentBoard[1][1].getValue() && currentBoard[1][1].getValue() == currentBoard[2][2].getValue() && currentBoard[0][0].getValue() != "") {
+      gameOver = true;
       return true;
     } else if (currentBoard[2][0].getValue() == currentBoard[1][1].getValue() && currentBoard[1][1].getValue() == currentBoard[0][2].getValue() && currentBoard[1][1].getValue() != "") {
+      gameOver = true;
       return true;
     } 
     //Return false if no winning condition is met
@@ -91,6 +96,7 @@ function GameController() {
         
       }
     }
+    gameOver = true;
     return true
   }
 
@@ -102,7 +108,7 @@ function GameController() {
     }
 
   }
-
+  const getGameOver = () => gameOver;
   const getActivePlayer = () => activePlayer
 
   return {
@@ -110,19 +116,16 @@ function GameController() {
     checkTie,
     changeTurns,
     getActivePlayer,
+    getGameOver,
     board
   }
 };
-
-
-
 
 
 const displayController  = (() => {
   const boardDiv = document.querySelector(".board")
   const gameLabelDiv = document.querySelector(".game-label")
 
-  const game = GameController()
 
   const updateLabel = (message) => {
     gameLabelDiv.textContent = message
@@ -151,7 +154,7 @@ const displayController  = (() => {
 
   const takeInput = (e) => {
     console.log(e.target)
-    if (e.target.textContent != "") {
+    if (e.target.textContent != "" || game.getGameOver())  {
       return
     } else {
       currentBoard = game.board.getBoard()
@@ -172,14 +175,23 @@ const displayController  = (() => {
     }
   }
 
+  document.addEventListener('keydown', (e) => {
+    if (e.keyCode == 78) {
+      game = GameController()
+      updateLabel(`It's ${game.getActivePlayer().getName()}'s Turn`)
+      refreshBoard()
+      return game
+    } else {
+      return
+    }
+  })
+
   const refreshBoard = () => {
     clearBoard()
     createBoard()
   }
 
-  updateLabel(`It's ${game.getActivePlayer().getName()}'s Turn`);
-  refreshBoard();
-
+  
 })()
 
 
