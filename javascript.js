@@ -47,12 +47,13 @@ const player2 = Player("Meg", 'O');
 
 
 
-const gameController = (() => {
+function GameController() {
 
   const board = Gameboard();
   const player1 = Player("Max", "X");
   const player2 = Player("Meg", 'O');
 
+  let gameOver = false;
   let activePlayer = player1;
 
 
@@ -93,15 +94,93 @@ const gameController = (() => {
     return true
   }
 
+  const changeTurns = () => {
+    if (activePlayer == player1) {
+      activePlayer = player2;
+    } else {
+      activePlayer = player1;
+    }
+
+  }
+
+  const getActivePlayer = () => activePlayer
+
   return {
     checkWinner,
-    checkTie
+    checkTie,
+    changeTurns,
+    getActivePlayer,
+    board
   }
-})();
+};
+
+
 
 
 
 const displayController  = (() => {
+  const boardDiv = document.querySelector(".board")
+  const gameLabelDiv = document.querySelector(".game-label")
+
+  const game = GameController()
+
+  const updateLabel = (message) => {
+    gameLabelDiv.textContent = message
+  }
+
+  const clearBoard = () => {
+    while (boardDiv.firstChild) {
+      boardDiv.lastChild.remove()
+    }
+  }
+
+  const createBoard = () => {
+    currentBoard =game.board.getBoard()
+    for (let i = 0; i<3; i++){
+      for (let j = 0; j < 3; j++) {
+        let cell = document.createElement('button')
+        cell.dataset.column = `${j}`
+        cell.dataset.row = `${i}`
+        cell.classList.add('cell')
+        cell.textContent = currentBoard[i][j].getValue()
+        cell.addEventListener('click', takeInput)
+        boardDiv.appendChild(cell)
+      }
+    }
+  }
+
+  const takeInput = (e) => {
+    console.log(e.target)
+    if (e.target.textContent != "") {
+      return
+    } else {
+      currentBoard = game.board.getBoard()
+      activePlayer = game.getActivePlayer()
+      let i = parseInt(e.target.dataset.row)
+      let j = parseInt(e.target.dataset.column)
+      currentBoard[i][j].setValue(activePlayer.getMarker())
+      refreshBoard()
+      if (game.checkWinner()) {
+        updateLabel(`${activePlayer.getName()} Won!`)
+      } else if (game.checkTie()) {
+        updateLabel("It's a Tie!")
+      } else{
+        game.changeTurns()
+        updateLabel(`It's ${game.getActivePlayer().getName()}'s Turn`);
+      }
+      
+    }
+  }
+
+  const refreshBoard = () => {
+    clearBoard()
+    createBoard()
+  }
+
+  updateLabel(`It's ${game.getActivePlayer().getName()}'s Turn`);
+  refreshBoard();
+
+})()
 
 
-})
+
