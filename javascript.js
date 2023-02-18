@@ -47,11 +47,15 @@ function GameController() {
 
   const board = Gameboard();
   const players = []
-  players.push(Player('Max',"X"))
-  players.push(Player('Meg',"O"))
+  
 
+  const addPlayer = (name, marker) => {
+    players.push(Player(name, marker))
+  }
+  
+  let computerPlayer = false;
   let gameOver = false;
-  let activePlayer = Math.floor(Math.random()*2);
+  let activePlayer = 0;
 
 
   const checkWinner = () => {
@@ -110,19 +114,21 @@ function GameController() {
 
   const playRound = () => {
     if (checkWinner()) {
-      return ([`${getActivePlayer().getName()} Won!`, `Press N to play a New Game`])
+      return (`${getActivePlayer().getName()} Won!`)
     } else if (checkTie()) {
-      return (["It's a Tie!", `Press N to play a New Game`])
+      return ("It's a Tie!")
     } else{
       changeTurns()
-      return (["", `It's ${getActivePlayer().getName()}'s Turn`])
+      return (`It's ${getActivePlayer().getName()}'s Turn`)
     }
   }
 
   return {
+    addPlayer,
     getActivePlayer,
     getGameOver,
     playRound,
+    computerPlayer,
     board
   }
 };
@@ -130,8 +136,9 @@ function GameController() {
 
 const displayController  = (() => {
   const boardDiv = document.querySelector(".board")
-  const gameLabelDiv = document.querySelector(".game-label")
   const winLabelDiv = document.querySelector(".win-label")
+  const playerButton = document.querySelector('.player');
+  const computerButton = document.querySelector('.computer');
 
 
   const updateLabel = (label,message) => {
@@ -153,8 +160,6 @@ const displayController  = (() => {
     }
   }
 
-  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-
   const createCell = (row,column) => {
     const cell = document.createElement('button')
       cell.dataset.column = `${column}`
@@ -175,22 +180,44 @@ const displayController  = (() => {
       let j = parseInt(e.target.dataset.column)
       currentBoard[i][j].setValue(activePlayer.getMarker())
       refreshBoard()
-      let messages = game.playRound()
-      updateLabel(winLabelDiv, messages[0])
-      updateLabel(gameLabelDiv, messages[1])
+      let message = game.playRound()
+      updateLabel(winLabelDiv, message)
+  
     }
   }
 
-  document.addEventListener('keydown', (e) => {
-    if (e.keyCode == 78) {
-      game = GameController()
-      updateLabel(gameLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`)
-      updateLabel(winLabelDiv, "")
-      refreshBoard()
-      return game
-    } else {
-      return
+  playerButton.addEventListener('click', () => {
+    game = GameController()
+    //Get First Name
+    let name = prompt("Enter first player's name: ")
+    while (name == '' || name == null) {
+      name = prompt("Enter first player's name: ") 
     }
+    game.addPlayer(name, "X")
+    //Get Second Name
+    name = prompt("Enter second player's name: ")
+    while (name == '' || name == null) {
+      name = prompt("Enter second player's name: ")
+    }
+    game.addPlayer(name, "O")
+    updateLabel(winLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`)
+    refreshBoard()
+    return game
+  })
+
+  computerButton.addEventListener('click', () => {
+    game = GameController()
+    //Get Player Name
+    let name = prompt("Enter the player's name: ")
+    while (name == '' || name == null) {
+      name = prompt("Enter first player's name: ") 
+    }
+    game.addPlayer(name, "X")
+    game.addPlayer('Computer', "O")
+    game.computerPlayer = true;
+    updateLabel(winLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`)
+    refreshBoard()
+    return game
   })
 
   const refreshBoard = () => {
