@@ -153,6 +153,8 @@ const displayController  = (() => {
     }
   }
 
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
   const createCell = (row,column) => {
     const cell = document.createElement('button')
       cell.dataset.column = `${column}`
