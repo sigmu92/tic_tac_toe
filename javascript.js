@@ -108,12 +108,21 @@ function GameController() {
   const getGameOver = () => gameOver;
   const getActivePlayer = () => players[activePlayer]
 
+  const playRound = () => {
+    if (checkWinner()) {
+      return ([`${getActivePlayer().getName()} Won!`, `Press N to play a New Game`])
+    } else if (checkTie()) {
+      return (["It's a Tie!", `Press N to play a New Game`])
+    } else{
+      changeTurns()
+      return (["", `It's ${getActivePlayer().getName()}'s Turn`])
+    }
+  }
+
   return {
-    checkWinner,
-    checkTie,
-    changeTurns,
     getActivePlayer,
     getGameOver,
+    playRound,
     board
   }
 };
@@ -125,7 +134,7 @@ const displayController  = (() => {
   const winLabelDiv = document.querySelector(".win-label")
 
 
-  const updateLabel = (label,message) => {
+  const updateLabels = (label,message) => {
     label.textContent = message
   }
 
@@ -164,17 +173,9 @@ const displayController  = (() => {
       let j = parseInt(e.target.dataset.column)
       currentBoard[i][j].setValue(activePlayer.getMarker())
       refreshBoard()
-      if (game.checkWinner()) {
-        updateLabel(winLabelDiv,`${activePlayer.getName()} Won!`)
-        updateLabel(gameLabelDiv,`Press N to play a New Game`)
-      } else if (game.checkTie()) {
-        updateLabel(winLabelDiv,"It's a Tie!")
-        updateLabel(gameLabelDiv,`Press N to play a New Game`)
-      } else{
-        game.changeTurns()
-        updateLabel(gameLabelDiv, `It's ${game.getActivePlayer().getName()}'s Turn`);
-      }
-      
+      let messages = game.playRound()
+      updateLabel(winLabelDiv, messages[0])
+      updateLabel(gameLabelDiv, messages[1])
     }
   }
 
