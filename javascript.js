@@ -134,7 +134,7 @@ const displayController  = (() => {
   const winLabelDiv = document.querySelector(".win-label")
 
 
-  const updateLabels = (label,message) => {
+  const updateLabel = (label,message) => {
     label.textContent = message
   }
 
